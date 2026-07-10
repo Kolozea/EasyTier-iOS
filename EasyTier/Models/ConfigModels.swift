@@ -175,6 +175,8 @@ nonisolated struct NetworkConfig: Codable {
     var socks5Proxy: String?
     
     var portForward: [PortForwardConfig]?
+
+    var acl: ACLConfig?
     
     var flags: Flags?
     
@@ -204,6 +206,7 @@ nonisolated struct NetworkConfig: Codable {
         case overrideDNS = "override_dns"
         case socks5Proxy = "socks5_proxy"
         case portForward = "port_forward"
+        case acl
         case flags
         case tcpWhitelist = "tcp_whitelist"
         case udpWhitelist = "udp_whitelist"
@@ -263,6 +266,8 @@ nonisolated struct NetworkConfig: Codable {
                 proto: $0.proto,
             )
         })
+
+        self.acl = profile.acl
         
         if profile.enableVPNPortal {
             self.vpnPortalConfig = VPNPortalConfig(

@@ -105,6 +105,8 @@ nonisolated struct NetworkProfile: Identifiable, Equatable {
     
     var portForwards: [PortForwardSetting] = []
 
+    var acl: ACLConfig? = nil
+
     var exitNodes: [TextItem] = []
 
     var enableSocks5: Bool = false
@@ -195,6 +197,8 @@ nonisolated struct NetworkProfile: Identifiable, Equatable {
                 )
             }
         }
+
+        profile.acl = config.acl
 
         if let vpnPortalConfig = config.vpnPortalConfig {
             profile.enableVPNPortal = true
