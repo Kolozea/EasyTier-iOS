@@ -178,6 +178,49 @@ struct NetworkEditView: View {
                 Text("mtu_help")
                 Text("instance_recv_bps_limit_help")
             }
+
+            Section {
+                Toggle(
+                    "common_text.enable",
+                    isOn: $profile.enableSecureMode
+                )
+                if profile.enableSecureMode {
+                    LabeledContent("local_private_key") {
+                        SecureField(
+                            "common_text.empty",
+                            text: $profile.secureModeLocalPrivateKey,
+                            prompt: Text("common_text.empty")
+                        )
+                        .labelsHidden()
+                        .multilineTextAlignment(.trailing)
+                        .font(.body.monospaced())
+                        .adaptiveNoTextInputAutocapitalization()
+                        .autocorrectionDisabled()
+                    }
+                    LabeledContent("local_public_key") {
+                        TextField(
+                            "common_text.empty",
+                            text: $profile.secureModeLocalPublicKey,
+                            prompt: Text("common_text.empty")
+                        )
+                        .labelsHidden()
+                        .multilineTextAlignment(.trailing)
+                        .font(.body.monospaced())
+                        .adaptiveNoTextInputAutocapitalization()
+                        .autocorrectionDisabled()
+                    }
+                }
+            } header: {
+                Text("secure_mode")
+            } footer: {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("secure_mode_help")
+                    if profile.enableSecureMode {
+                        Text("local_private_key_help")
+                        Text("local_public_key_help")
+                    }
+                }
+            }
             
             Section("vpn_portal_config") {
                 Toggle(

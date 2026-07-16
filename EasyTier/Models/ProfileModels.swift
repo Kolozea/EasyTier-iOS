@@ -64,6 +64,10 @@ nonisolated struct NetworkProfile: Identifiable, Equatable {
     var hostname: String = ""
     var networkSecret: String = ""
 
+    var enableSecureMode: Bool = false
+    var secureModeLocalPrivateKey: String = ""
+    var secureModeLocalPublicKey: String = ""
+
     var peerURLs: [TextItem] = []
 
     var proxyCIDRs: [ProxyCIDR] = []
@@ -141,6 +145,12 @@ nonisolated struct NetworkProfile: Identifiable, Equatable {
         }
         profile.networkName = config.networkIdentity?.networkName ?? config.instanceName
         profile.networkSecret = config.networkIdentity?.networkSecret ?? ""
+
+        if let secureMode = config.secureMode {
+            profile.enableSecureMode = secureMode.enabled
+            profile.secureModeLocalPrivateKey = secureMode.localPrivateKey ?? ""
+            profile.secureModeLocalPublicKey = secureMode.localPublicKey ?? ""
+        }
 
         if let dhcp = config.dhcp {
             profile.dhcp = dhcp

@@ -3384,6 +3384,70 @@
         }
       }
     },
+    "local_private_key" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local Private Key"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本地私钥"
+          }
+        }
+      }
+    },
+    "local_private_key_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "local private key for secure mode. if not provided, a random key will be generated"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "安全模式下的本地私钥。如果未提供，则会随机生成一个密钥"
+          }
+        }
+      }
+    },
+    "local_public_key" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local Public Key"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本地公钥"
+          }
+        }
+      }
+    },
+    "local_public_key_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "local public key for secure mode. if not provided, a random key will be generated, or use local private key to derive public key"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "安全模式下的本地公钥。如果未提供，则会随机生成一个密钥，或者使用本地私钥派生公钥"
+          }
+        }
+      }
+    },
     "log_level" : {
       "localizations" : {
         "en" : {
@@ -4970,6 +5034,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "搜索域名"
+          }
+        }
+      }
+    },
+    "secure_mode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Secure Mode"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "安全模式"
+          }
+        }
+      }
+    },
+    "secure_mode_help" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "if true, enable secure mode. default is false"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "如果为true，则启用安全模式。默认值为false"
           }
         }
       }

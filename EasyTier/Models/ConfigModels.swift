@@ -149,6 +149,18 @@ nonisolated struct NetworkConfig: Codable {
         }
     }
 
+    struct SecureModeConfig: Codable {
+        var enabled: Bool
+        var localPrivateKey: String?
+        var localPublicKey: String?
+
+        enum CodingKeys: String, CodingKey {
+            case enabled
+            case localPrivateKey = "local_private_key"
+            case localPublicKey = "local_public_key"
+        }
+    }
+
     var netns: String?
     var hostname: String?
     var instanceName: String
@@ -175,6 +187,8 @@ nonisolated struct NetworkConfig: Codable {
     var socks5Proxy: String?
     
     var portForward: [PortForwardConfig]?
+
+    var secureMode: SecureModeConfig?
 
     var acl: ACLConfig?
     
@@ -206,6 +220,7 @@ nonisolated struct NetworkConfig: Codable {
         case overrideDNS = "override_dns"
         case socks5Proxy = "socks5_proxy"
         case portForward = "port_forward"
+        case secureMode = "secure_mode"
         case acl
         case flags
         case tcpWhitelist = "tcp_whitelist"
@@ -269,6 +284,16 @@ nonisolated struct NetworkConfig: Codable {
                 proto: $0.proto,
             )
         })
+
+        if profile.enableSecureMode {
+            self.secureMode = SecureModeConfig(
+                enabled: true,
+                localPrivateKey: profile.secureModeLocalPrivateKey.isEmpty ? nil : profile.secureModeLocalPrivateKey,
+                localPublicKey: profile.secureModeLocalPublicKey.isEmpty ? nil : profile.secureModeLocalPublicKey
+            )
+        } else {
+            self.secureMode = nil
+        }
 
         self.acl = profile.acl
         
