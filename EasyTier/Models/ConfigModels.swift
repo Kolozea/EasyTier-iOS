@@ -359,7 +359,7 @@ nonisolated struct NetworkConfig: Codable {
         
         self.mappedListeners = emptyAsNil(profile.mappedListeners.compactMap { $0.text.isEmpty ? nil : $0.text })
         
-        self.ipv6PublicAddrAuto = profile.ipv6PublicAddrAuto
+        self.ipv6PublicAddrAuto = takeIfChanged(profile.ipv6PublicAddrAuto, def.ipv6PublicAddrAuto)
         
         var tempFlags = self.flags ?? Flags()
         
