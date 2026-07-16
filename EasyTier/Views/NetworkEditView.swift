@@ -182,7 +182,15 @@ struct NetworkEditView: View {
             Section {
                 Toggle(
                     "common_text.enable",
-                    isOn: $profile.enableSecureMode
+                    isOn: Binding(
+                        get: { profile.enableSecureMode },
+                        set: { enabled in
+                            profile.enableSecureMode = enabled
+                            if enabled {
+                                try? profile.prepareSecureModeKeys()
+                            }
+                        }
+                    )
                 )
                 if profile.enableSecureMode {
                     LabeledContent("local_private_key") {
@@ -213,13 +221,7 @@ struct NetworkEditView: View {
             } header: {
                 Text("secure_mode")
             } footer: {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("secure_mode_help")
-                    if profile.enableSecureMode {
-                        Text("local_private_key_help")
-                        Text("local_public_key_help")
-                    }
-                }
+                Text("secure_mode_help")
             }
             
             Section("vpn_portal_config") {
