@@ -22,6 +22,21 @@ enum SecureModeKeyError: LocalizedError {
     }
 }
 
+enum PeerPublicKeyError: LocalizedError {
+    case invalid(peerURI: String)
+
+    var errorDescription: String? {
+        switch self {
+        case .invalid(let peerURI):
+            let peer = peerURI.isEmpty ? String(localized: "initial_node") : peerURI
+            return String(
+                format: String(localized: "peer_public_key_error.invalid"),
+                peer
+            )
+        }
+    }
+}
+
 struct BoolFlag: Identifiable {
     let id = UUID()
     let keyPath: WritableKeyPath<NetworkProfile, Bool>
@@ -30,6 +45,12 @@ struct BoolFlag: Identifiable {
 }
 
 nonisolated struct NetworkProfile: Identifiable, Equatable {
+    struct PeerSetting: Identifiable, Equatable {
+        var id = UUID()
+        var uri: String = ""
+        var peerPublicKey: String?
+    }
+
     struct PortForwardSetting: Codable, Hashable, Identifiable {
         var id = UUID()
         var bindAddr: String = ""
@@ -89,7 +110,7 @@ nonisolated struct NetworkProfile: Identifiable, Equatable {
     var secureModeLocalPrivateKey: String = ""
     var secureModeLocalPublicKey: String = ""
 
-    var peerURLs: [TextItem] = []
+    var peerConfigs: [PeerSetting] = []
 
     var proxyCIDRs: [ProxyCIDR] = []
 
@@ -184,9 +205,11 @@ nonisolated struct NetworkProfile: Identifiable, Equatable {
         }
 
         if let peer = config.peer, !peer.isEmpty {
-            profile.peerURLs = peer.map { .init($0.uri) }
+            profile.peerConfigs = peer.map {
+                .init(uri: $0.uri, peerPublicKey: $0.peerPublicKey)
+            }
         } else {
-            profile.peerURLs = []
+            profile.peerConfigs = []
         }
 
         if let listeners = config.listeners {
@@ -370,6 +393,26 @@ nonisolated struct NetworkProfile: Identifiable, Equatable {
         var config = self.baseConfig.value ?? .init(id: id, name: networkName)
         config.apply(from: self)
         return config
+    }
+
+    static func normalizedPeerPublicKey(_ value: String?, peerURI: String) throws -> String? {
+        guard let value else { return nil }
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+        guard let decoded = Data(base64Encoded: trimmed), decoded.count == 32 else {
+            throw PeerPublicKeyError.invalid(peerURI: peerURI)
+        }
+        return decoded.base64EncodedString()
+    }
+
+    mutating func prepareForUse() throws {
+        for index in peerConfigs.indices {
+            peerConfigs[index].peerPublicKey = try Self.normalizedPeerPublicKey(
+                peerConfigs[index].peerPublicKey,
+                peerURI: peerConfigs[index].uri
+            )
+        }
+        try prepareSecureModeKeys()
     }
 
     mutating func prepareSecureModeKeys() throws {
