@@ -338,7 +338,7 @@ nonisolated struct NetworkConfig: Codable {
         }
         
         if profile.enableManualRoutes {
-            self.routes = emptyAsNil(profile.routes.map { $0.cidrString })
+            self.routes = profile.routes.map { $0.cidrString }
         } else {
             self.routes = nil
         }
