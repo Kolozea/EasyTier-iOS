@@ -19,13 +19,23 @@ jobs:
         run: |
           xcodebuild -version
           swift --version
+          rustc --version || true
+          protoc --version || true
 
-      - name: Install Rust and protoc
+      - name: Install Rust target and protoc
         run: |
-          chmod +x ci_scripts/ci_post_clone.sh
-          ./ci_scripts/ci_post_clone.sh
+          set -e
+          if ! command -v rustup >/dev/null 2>&1; then
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+            echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+            export PATH="$HOME/.cargo/bin:$PATH"
+          fi
+          rustup target add aarch64-apple-ios
+          if ! command -v protoc >/dev/null 2>&1; then
+            brew install protobuf
+          fi
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          protoc --version
 
       - name: Resolve Swift packages
         run: |
