@@ -1,0 +1,71 @@
+name: Build Unsigned IPA
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/build-unsigned-ipa.yml"
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show build environment
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Install Rust and protoc
+        run: |
+          chmod +x ci_scripts/ci_post_clone.sh
+          ./ci_scripts/ci_post_clone.sh
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Resolve Swift packages
+        run: |
+          xcodebuild \
+            -resolvePackageDependencies \
+            -project EasyTier.xcodeproj \
+            -scheme EasyTier
+
+      - name: Build unsigned app
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project EasyTier.xcodeproj \
+            -scheme EasyTier \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination "generic/platform=iOS" \
+            -derivedDataPath "$PWD/build/DerivedData" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build | tee build.log
+
+      - name: Package unsigned IPA
+        run: |
+          APP_PATH="build/DerivedData/Build/Products/Release-iphoneos/EasyTier.app"
+          test -d "$APP_PATH"
+          mkdir -p build/Payload
+          ditto "$APP_PATH" "build/Payload/EasyTier.app"
+          cd build
+          /usr/bin/zip -qry EasyTier-unsigned.ipa Payload
+          shasum -a 256 EasyTier-unsigned.ipa > EasyTier-unsigned.ipa.sha256
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: EasyTier-unsigned-ipa
+          path: |
+            build/EasyTier-unsigned.ipa
+            build/EasyTier-unsigned.ipa.sha256
+            build.log
+          if-no-files-found: error
+          retention-days: 14
